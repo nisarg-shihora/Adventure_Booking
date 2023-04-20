@@ -1,0 +1,199 @@
+{% extends 'flight/layout.html' %}
+
+{% load static %}
+
+{% block head %}
+    <title>Search Adventure</title>
+    <link rel="stylesheet" href="{% static 'css/search_style.css' %}">
+    <link rel="stylesheet" href="{% static 'css/search2_style.css' %}">
+    <!--<script src="{% static 'js/search.js' %}"></script>-->
+    <script src="{% static 'js/search2.js' %}"></script>
+{% endblock %}
+
+{% block body %}
+    <section class="section section1">
+        <div class="query-data-div">
+            <div class="container">
+                <div class="trip-places">
+                    <div class="from-div text-align-left">
+                        <div class="small-label">Comming From</div>
+                        <div class="white">{{origin.city}} ({{origin.code}})</div>
+{#                        <div class="white">{{adven}}</div>#}
+                    </div>
+                    <div class="trip-type-div white">
+                        <div class="small-label">&nbsp;</div>
+                            <svg width="1em" height="1em" viewBox="0 0 16 16" class="bi bi-arrow-right" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                                <path fill-rule="evenodd" d="M1 8a.5.5 0 0 1 .5-.5h11.793l-3.147-3.146a.5.5 0 0 1 .708-.708l4 4a.5.5 0 0 1 0 .708l-4 4a.5.5 0 0 1-.708-.708L13.293 8.5H1.5A.5.5 0 0 1 1 8z"/>
+                            </svg>
+                    </div>
+                    <div class="to-div text-align-right">
+                        <div class="small-label">Adventure At</div>
+                        <div class="white">{{destination.city}} ({{destination.code}})</div>
+                    </div>
+                </div>
+                <div class="v-line"></div>
+                <div class="trip-time">
+                    <div class="depart-date-div">
+                        <div class="small-label">Check In Date</div>
+                        <div class="white">{{depart_date|date:"D, d M Y"}}</div>
+                    </div>
+                    <div class="return-date-div">
+                        <div class="small-label">Check Out Date</div>
+                        <div class="white">
+                            {% if return_date %}
+                                {{return_date|date:"D, d M Y"}}
+                            {% else %}
+                                --
+                            {% endif %}
+                        </div>
+                    </div>
+                </div><div class="v-line"></div>
+                <div class="trip-class">
+                    <div class="return-date-div">
+                        <div class="small-label">Service</div>
+                        <div class="white">{{service}}</div>
+{#                        <div class="white">{{service}}</div>#}
+                    </div>
+                </div>
+                <div class="v-line"></div>
+                <div class="trip-modify">
+                    <form action="/" method="POST">
+                        {% csrf_token %}
+                        <input type="hidden" name="Origin" value="{{origin.code|upper}}">
+                        <input type="hidden" name="Destination" value="{{destination.code|upper}}">
+                        <input type="hidden" name="DepartDate" value='{{depart_date|date:"Y-m-d"}}'>
+                        <input type="hidden" name="ReturnDate" value='{{return_date|date:"Y-m-d"}}'>
+                        <input type="hidden" name="SeatClass" value="{{service|lower}}">
+                        <input type="hidden" name="TripType" id="trip-identifier" value="{{trip_type}}">
+
+{#                        <input type="hidden" name="adven" value="{{adven|upper}}">#}
+{#                        <input type="hidden" name="destination" value="{{destination.code|upper}}">#}
+{#                        <input type="hidden" name="CheckInDate" value='{{depart_date|date:"Y-m-d"}}'>#}
+{#                        <input type="hidden" name="Check-Out-Date" value='{{return_date|date:"Y-m-d"}}'>#}
+{#                        <input type="hidden" name="ServiceClass" value="{{service|lower}}">#}
+{#                        <input type="hidden" name="TripType" id="trip-identifier" value="{{trip_type}}">#}
+                        <button class="btn spl-btn" type="submit" style="background-color: #0e3e71; border-color: #0e3e71">Re-Search</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+        <div class="query-result-div" style="background-image: linear-gradient(rgba(0,0,0,0.2),rgba(0,0,0,0.2)), url({% static 'img/contact-us.jpg' %}); ">
+            <div class="container">
+                <div class="row">
+                    {% if allbooks %}
+                        <div class="col-lg-3 filter-div">
+                            <div class="close-filter" style="margin-top: 0;">
+                                <button class="btn b1" onclick="close_filter(this)">
+                                    <svg width="1.2em" height="1.2em" viewBox="0 0 16 16" class="bi bi-arrow-left" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                                        <path fill-rule="evenodd" d="M15 8a.5.5 0 0 0-.5-.5H2.707l3.147-3.146a.5.5 0 1 0-.708-.708l-4 4a.5.5 0 0 0 0 .708l4 4a.5.5 0 0 0 .708-.708L2.707 8.5H14.5A.5.5 0 0 0 15 8z"/>
+                                    </svg>
+                                </button>
+                            </div>
+                            <div class="filter">
+                            </div>
+                        </div>
+                            <div id="flights_div" style="display: flex; flex-wrap: wrap; align-content: flex-end; flex-direction: row; justify-content: space-evenly; margin-bottom: 5%">
+                                {% for book in allbooks %}
+                                     <div class="each-flight-div-box show" style="background-color: white">
+                                        <div class="each-flight-div" onclick="media_click(this)" style="background-color: white;" >
+                                            <div class="flight-company">
+                                                <div class="flight-icon">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="24" height="24">
+                                                            <path d="M21.7 11.3l-9-9C12.5 2.1 12.3 2 12 2s-.5.1-.7.3l-9 9C2.1 11.5 2 11.7 2 12s.1.5.3.7l9 9c.2.2.4.3.7.3s.5-.1.7-.3l9-9c.2-.2.3-.4.3-.7s-.1-.5-.3-.7zM12 18.5c-3.6 0-6.5-2.9-6.5-6.5S8.4 5.5 12 5.5s6.5 2.9 6.5 6.5-2.9 6.5-6.5 6.5zm0-11c-2.5 0-4.5 2-4.5 4.5s2 4.5 4.5 4.5 4.5-2 4.5-4.5-2-4.5-4.5-4.5z"/>
+                                                    </svg>
+                                                </div>
+                                                <div class="company-details">
+                                                    <div class="company-name">{{book.adven}}</div>
+                                                    <div class="plane-name">{{book.resort}}</div>
+                                                </div>
+                                            </div>
+                                            <div class="flight-time flight-time-div">
+                                                <div class="flight-origin-time">
+                                                    <div class="flight-time">
+                                                        <h5>({{book.check_in_timing|time:"H:i"}})</h5>
+                                                    </div>
+                                                </div>
+
+                                                <div class="flight-stops tooltip">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" width="34" height="24" viewBox="0 0 24 24">
+                                                        <path d="M13,9.03544443 C14.6961471,9.27805926 16,10.736764 16,12.5 C16,14.263236 14.6961471,15.7219407 13,15.9645556 L13,21.5207973 C13,21.7969397 12.7761424,22.0207973 12.5,22.0207973 C12.2238576,22.0207973 12,21.7969397 12,21.5207973 L12,15.9645556 C10.3038529,15.7219407 9,14.263236 9,12.5 C9,10.736764 10.3038529,9.27805926 12,9.03544443 L12,3.5 C12,3.22385763 12.2238576,3 12.5,3 C12.7761424,3 13,3.22385763 13,3.5 L13,9.03544443 L13,9.03544443 Z M12.5,15 C13.8807119,15 15,13.8807119 15,12.5 C15,11.1192881 13.8807119,10 12.5,10 C11.1192881,10 10,11.1192881 10,12.5 C10,13.8807119 11.1192881,15 12.5,15 Z" transform="rotate(90 12.5 12.51)"/>
+                                                    </svg>
+                                                    <span class="tooltiptext" data-value="{{book.duration}}"></span><!--07 hrs 50 mins-->
+                                                </div>
+                                                <div class="flight-destination-time">
+                                                    <div class="flight-time">
+                                                        <h5>({{book.check_out_time|time:"H:i"}})</h5>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div class="flight-details">
+                                                <div class="flight-price">
+                                                    <h5>
+                                                            {% if trip_type == '1' %}
+                                                            <span>
+{#                                                                {% if service == 'Regular' %}{{book.regular_fare}}{% endif %}#}
+{#                                                                {% if service == 'Premium' %}{{book.premium_fare}}{% endif %}#}
+                                                                USD ${{ book.regular_fare }}
+                                                            </span>
+                                                            {% elif trip_type == '2' %}
+                                                            <span>
+                                                                CAD ${{ book.regular_fare }}
+                                                            </span>
+{#                                                            {% elif trip_type == 2 %}#}
+{#                                                            <span>#}
+{#                                                                {% if seat == 'REGULAR' %}{{(flight.regular_fare)*1.50}}{% endif %}#}
+{#                                                                {% if seat == 'PREMIUM' %}{{(flight.premium_fare)*1.50}}{% endif %}#}
+{#                                                            </span>#}
+{#                                                            {% elif trip_type == 2 %}#}
+{#                                                            <span>#}
+{#                                                                {% if seat == 'REGULAR' %}{{(flight.regular_fare)*0.82}}{% endif %}#}
+{#                                                                {% if seat == 'PREMIUM' %}{{(flight.premium_fare)*0.82}}{% endif %}#}
+{#                                                            </span>#}
+{#                                                            {% elif trip_type == 2 %}#}
+{#                                                            <span>#}
+{#                                                                {% if seat == 'REGULAR' %}{{(flight.regular_fare)*0.93}}{% endif %}#}
+{#                                                                {% if seat == 'PREMIUM' %}{{(flight.premium_fare)*0.93}}{% endif %}#}
+{#                                                            </span>#}
+                                                        {% endif %}
+                                                    </h5>
+                                                </div>
+                                                <div class="flight-details-btn" style="margin-left: 40px">
+                                                        <form action="{% url 'review' %}" method="GET" style="display: flex;">
+                                                            <input type="hidden" name="bookId" value="{{book.id}}">
+                                                            <input type="hidden" name="bookDate", value="{{depart_date|date:'d-m-Y'}}">
+                                                            <input type="hidden" name="returnDate", value="{{return_date|date:'d-m-Y'}}">
+                                                            <input type="hidden" name="serviceClass" value="{{service}}">
+                                                            <input type="hidden" name="duration" value="{{book.duration}}">
+                                                            <input type="hidden" name="trip_type" value="{{trip_type}}">
+                                                            <button class="btn btn-primary btn-danger o-b" style="background-color: #0e3e71; border-color: #0e3e71;" type="submit">
+                                                                Book Now <!--&#8594;-->
+                                                            </button>
+                                                        </form>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                {% endfor %}
+                            </div>
+                        </div>
+                    {% else %}
+                        <div style="height: 100%; width:100%; padding: 10%;">
+                            <div style="text-align: center; margin: auto;">
+                                <svg width="4em" height="4em" viewBox="0 0 16 16" class="bi bi-exclamation-circle" fill="currentColor" xmlns="http://www.w3.org/2000/svg">
+                                    <path fill-rule="evenodd" d="M8 15A7 7 0 1 0 8 1a7 7 0 0 0 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/>
+                                    <path d="M7.002 11a1 1 0 1 1 2 0 1 1 0 0 1-2 0zM7.1 4.995a.905.905 0 1 1 1.8 0l-.35 3.507a.552.552 0 0 1-1.1 0L7.1 4.995z"/>
+                                </svg>
+                                <br><br>
+                                <h3>Sorry, No adventures available now for this Search</h3>
+                                <p>
+                                    We can not find any adventures for the service of your search. Please modify your search criteria and try again.
+                                </p>
+                            </div>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </section>
+{% endblock %}
